@@ -1,0 +1,30 @@
+
+name: Build GOLD RAIN APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get project
+        uses: actions/checkout@v4
+
+      - name: Build Android APK
+        run: |
+          mkdir -p build-cache gradle-cache
+          docker run --rm \
+            -u "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}":/home/user/hostcwd \
+            -v "${{ github.workspace }}/build-cache":/home/user/.buildozer \
+            -v "${{ github.workspace }}/gradle-cache":/home/user/.gradle \
+            kivy/buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GOLD-RAIN-APK
+          path: bin/*.apk
+          if-no-files-found: error
+          
